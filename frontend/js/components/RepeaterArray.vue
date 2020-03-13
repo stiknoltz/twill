@@ -75,7 +75,7 @@
         return true
       },
       blockTypes: function () {
-        let blockTypes = []
+        const blockTypes = []
         const availableBlocks = this.availableBlocks
         this.types.forEach(function (t, i) {
           blockTypes.push(availableBlocks[t])
@@ -132,7 +132,7 @@
       }
     },
     mounted: function () {
-      let self = this
+      const self = this
       // if there are blocks, these should be all collapse by default
       this.$nextTick(function () {
         if (self.savedBlocks.length > 0) self.collapseAllBlocks()
