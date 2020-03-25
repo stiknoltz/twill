@@ -203,6 +203,7 @@
         }
 
         // check text length
+        // check text length
         if (this.hasMaxlength && this.showCounter) {
           this.updateCounter(this.getTextLength())
         }
@@ -211,6 +212,7 @@
         this.$emit('ready', this.quill)
       },
       anchorHandler (value) {
+        console.log(value)
         if (value === true) {
           value = prompt('Enter anchor:')
         } else {
@@ -219,6 +221,20 @@
           value = prompt('Edit anchor:', id)
         }
         this.quill.format('anchor', value)
+      },
+      addInlineClassHandler (value) {
+        console.log(value)
+        console.log(this.quill.getSelection())
+
+        const range = this.quill.getSelection()
+
+        console.log(this.quill.getFormat(range))
+
+        let currentUrl = this.quill.getFormat(range).url || ''
+
+        currentUrl = prompt('Link URL:', currentUrl)
+
+        this.quill.format('button-link', { url: currentUrl, className: value })
       },
       updateEditor: function (newValue) {
         // convert string to HTML and update the content silently
@@ -255,6 +271,7 @@
       }
     },
     mounted: function () {
+      console.log('test')
       if (this.quill) return
 
       /* global hljs */
@@ -272,12 +289,19 @@
       this.options.readOnly = this.options.readOnly !== undefined ? this.options.readOnly : this.readonly
       this.options.formats = QuillConfiguration.getFormats(this.options.modules.toolbar) // Formats are based on current toolbar configuration
       this.options.scrollingContainer = null
-
+      console.log(toolbar)
       // register custom handlers
       // register anchor toolbar handler
       if (toolbar.container.includes('anchor')) {
         toolbar.handlers.anchor = this.anchorHandler
       }
+      // register button-link toolbar handler
+      const inlineClassCheck = toolbar.container.filter(k => k['button-link'] !== undefined)
+      if (inlineClassCheck.length) {
+        toolbar.handlers['button-link'] = this.addInlineClassHandler
+      }
+
+      toolbar.handlers['button-link'] = this.addInlineClassHandler
 
       this.options.modules.toolbar = toolbar
 
@@ -326,6 +350,30 @@
   }
 </style>
 <style lang="scss">
+  @function capitalize($string) {
+    @return to-upper-case(str-slice($string, 1, 1)) + str-slice($string, 2);
+  }
+
+  @function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+      @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+  }
+
+  @function str-replace-cap($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+      @return capitalize(str-slice($string, 1, $index - 1)) + $replace + str-replace-cap(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return capitalize($string);
+  }
+
   /* Not scoped style here because we want to overwrite default style of the wysiwig */
   .a17 {
     .ql-toolbar.ql-snow {
@@ -603,6 +651,28 @@
           font-weight: normal;
           font-size: 1em;
           white-space: nowrap;
+        }
+      }
+    }
+
+    .ql-picker.ql-button-link {
+      width: 120px;
+
+      .ql-picker-label::before,
+      .ql-picker-item::before {
+        content: 'Button Link';
+      }
+
+      $buttons: 'btn btn-primary', 'btn btn-secondary', 'btn btn-dark', 'btn btn-light', 'btn btn-outline-primary', 'btn btn-outline-secondary', 'btn btn-outline-dark', 'btn btn-outline-light';
+
+      @each $button in $buttons {
+        $specificClass: str-slice($button, 8);
+        $title: str-replace-cap($specificClass, '-', ' ');
+        $buttonQuote: quote($button);
+
+        .ql-picker-label[data-value="#{$buttonQuote}"]::before,
+        .ql-picker-item[data-value="#{$buttonQuote}"]::before {
+          content: "#{$title}";
         }
       }
     }

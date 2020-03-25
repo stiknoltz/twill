@@ -9,10 +9,37 @@ const Inline = Quill.import('blots/inline')
 const Link = Quill.import('formats/link')
 
 /*
+* Support for buttons
+*/
+
+class ButtonLink extends Link {
+  static create (value) {
+    const node = super.create(value.url)
+    node.className = value.className
+    return node
+  }
+
+  format (name, value) {
+    if (name !== this.statics.blotName || !value.url) {
+      super.format(name, value)
+    } else {
+      this.domNode.setAttribute('href', this.constructor.sanitize(value.url))
+      this.domNode.className(value.className)
+    }
+  }
+}
+
+ButtonLink.blotName = 'button-link'
+ButtonLink.tagName = 'A'
+
+Quill.register(ButtonLink)
+
+/*
 * Support for shift enter
 * @see https://github.com/quilljs/quill/issues/252
 * @see https://codepen.io/mackermedia/pen/gmNwZP
 */
+
 const lineBreak = {
   blotName: 'break',
   tagName: 'BR'
@@ -194,7 +221,9 @@ const QuillDefaultFormats = [
   'code-block',
   'formula',
   'image',
-  'video'
+  'video',
+  'button',
+  'button-link'
 ]
 
 function getQuillFormats (toolbarEls) {
