@@ -212,7 +212,6 @@
         this.$emit('ready', this.quill)
       },
       anchorHandler (value) {
-        console.log(value)
         if (value === true) {
           value = prompt('Enter anchor:')
         } else {
@@ -223,12 +222,7 @@
         this.quill.format('anchor', value)
       },
       addInlineClassHandler (value) {
-        console.log(value)
-        console.log(this.quill.getSelection())
-
         const range = this.quill.getSelection()
-
-        console.log(this.quill.getFormat(range))
 
         let currentUrl = this.quill.getFormat(range).url || ''
 
@@ -271,7 +265,6 @@
       }
     },
     mounted: function () {
-      console.log('test')
       if (this.quill) return
 
       /* global hljs */
@@ -289,7 +282,7 @@
       this.options.readOnly = this.options.readOnly !== undefined ? this.options.readOnly : this.readonly
       this.options.formats = QuillConfiguration.getFormats(this.options.modules.toolbar) // Formats are based on current toolbar configuration
       this.options.scrollingContainer = null
-      console.log(toolbar)
+
       // register custom handlers
       // register anchor toolbar handler
       if (toolbar.container.includes('anchor')) {
