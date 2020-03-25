@@ -51,7 +51,7 @@
       },
       opened: {
         type: Boolean,
-        default: true
+        default: false
       },
       closed: {
         type: Boolean,
@@ -70,7 +70,7 @@
     },
     data: function () {
       return {
-        visible: true,
+        visible: false,
         hover: false,
         withMoveDropdown: true,
         withAddDropdown: true

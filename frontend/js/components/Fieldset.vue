@@ -123,7 +123,7 @@
   }
 
   .s--open {
-    .fieldset__header {
+    & > .fieldset__header {
       margin-bottom: 0;
       border-radius: 2px 2px 0 0;
 
@@ -132,11 +132,11 @@
       }
     }
 
-    .fieldset__header .icon {
+    & > .fieldset__header .icon {
       transform: rotate(180deg);
     }
 
-    .fieldset__content {
+    & > .fieldset__content {
       display: block;
     }
   }
