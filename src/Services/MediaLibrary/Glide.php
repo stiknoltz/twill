@@ -52,8 +52,17 @@ class Glide implements ImageServiceInterface
         $this->app = $app;
         $this->request = $request;
 
+        $baseUrlHost = $this->config->get(
+            'twill.glide.base_url',
+            $this->request->getScheme() . '://' . str_replace(
+                ['http://', 'https://'],
+                '',
+                $this->config->get('app.url')
+            )
+        );
+
         $baseUrl = join('/', [
-            rtrim($this->config->get('twill.glide.base_url'), '/'),
+            rtrim($baseUrlHost, '/'),
             ltrim($this->config->get('twill.glide.base_path'), '/'),
         ]);
 
@@ -189,7 +198,7 @@ class Glide implements ImageServiceInterface
      */
     public function getRawUrl($id)
     {
-        return $this->urlBuilder->getUrL($id);
+        return $this->urlBuilder->getUrl($id);
     }
 
     /**
@@ -198,7 +207,7 @@ class Glide implements ImageServiceInterface
      */
     public function getDimensions($id)
     {
-        $url = $this->urlBuilder->getUrL($id);
+        $url = $this->urlBuilder->getUrl($id);
 
         try {
             list($w, $h) = getimagesize($url);

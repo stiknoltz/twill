@@ -119,6 +119,8 @@ return [
     'files_table' => 'files',
     'fileables_table' => 'fileables',
     'related_table' => 'related',
+    'tags_table' => 'tags',
+    'tagged_table' => 'tagged',
 ];
 ```
 
@@ -149,12 +151,26 @@ return [
 
 Since Twill 2.0, Twill's own UI can be translated using lang files. Users can choose their own prefered languages in their own settings,
 but you might actually want to default to another language than English for all your users.
-You can use the following configuration for exemple to set Twill's default CMS language to French:
+You can use the following configuration for example to set Twill's default CMS language to French:
 
 ```php
 return [
     'locale' => 'fr',
     'fallback_locale' => 'en',
+];
+```
+
+**Publisher date and time format configuration**
+
+To change the format of the publication fields when using `publish_start_date` and `publish_end_date` on your model you can change these keys in `twill.php`.
+
+```php
+<?php
+
+return [
+    'publish_date_24h' => false, // enable 24h format in publisher dates
+    'publish_date_format' => 'd F Y H:i', // format used by publication date pickers
+    'publish_date_display_format' => 'DD MMMM YYYY HH:mm', // format used when displaying the publication date
 ];
 ```
 
@@ -243,6 +259,15 @@ S3_BUCKET=bucket-name
 ```
 
 Optionally, you can use the `S3_REGION` variable to specify a region other than S3's default region (`us-east-1`).
+
+If you prefer to use another S3 compliant storage such as Minio, provide your application with the following environment variables:
+
+```bash
+S3_KEY=S3_KEY
+S3_SECRET=S3_SECRET
+S3_BUCKET=bucket-name
+S3_ENDPOINT=https://YOUR_S3_DOMAIN
+```
 
 When uploading images to S3, Twill sets the `acl` parameter to `private`. This is because images in your bucket should not be publicly accessible when using a service like [Imgix](https://imgix.com) on top of it. Only Imgix should have read-only access to your bucket, while your application obviously needs to have write access. If you intend to access images uploaded to S3 directly, set the `MEDIA_LIBRARY_ACL` variable or `acl` configuration option to `public-read`.
 

@@ -158,6 +158,11 @@
               }
             })
       },
+      replaceMedia: function (id) {
+        this.media_to_replace_id = id
+        const qqinputs = this.$refs.uploaderBrowseButton.querySelectorAll('[name = "qqfile"]')
+        qqinputs[Array.from(qqinputs).length - 1].click()
+      },
       loadingProgress: function (media) {
         this.$store.commit(MEDIA_LIBRARY.PROGRESS_UPLOAD_MEDIA, media)
       },
@@ -190,8 +195,11 @@
       _onSubmitCallback (id, name) {
         this.$emit('clear')
         // each upload session will add upload files with original filenames in a folder named using a uuid
-        this.dirUUID = this.dirUUID || qq.getUniqueId()
-        this.unique_folder_name = this.unique_folder_name || (this.uploaderConfig.endpointRoot + this.dirUUID)
+        this.unique_folder_name = this.unique_folder_name || (this.uploaderConfig.endpointRoot + qq.getUniqueId())
+        this._uploader.methods.setParams({
+          unique_folder_name: this.unique_folder_name,
+          media_to_replace_id: this.media_to_replace_id
+        }, id)
 
         if (this.type.value === 'image') {
           // determine the image dimensions and add it to params sent on upload success
@@ -210,9 +218,12 @@
           img.src = imageUrl
         } else {
           this._uploader.methods.setParams({
+            width: img.width,
+            height: img.height,
             unique_folder_name: this.unique_folder_name,
-            dir_uuid: this.dirUUID
+            media_to_replace_id: this.media_to_replace_id
           }, id)
+          this.media_to_replace_id = null
         }
 
         const media = {
@@ -220,7 +231,13 @@
           name: sanitizeFilename(name),
           progress: 0,
           error: false,
-          errorMessage: null
+          errorMessage: null,
+          isReplacement: !!this.media_to_replace_id,
+          replacementId: this.media_to_replace_id
+        }
+
+        if (this.type.value === 'file') {
+          this.media_to_replace_id = null
         }
 
         this.loadingMedias.push(media)
@@ -244,7 +261,7 @@
           this.loadingError(this.loadingMedias[index])
         } else {
           const media = {
-            id: this._uploader.methods.getUuid(id),
+            id: id ? this._uploader.methods.getUuid(id) : Math.floor(Math.random() * 1000),
             name: sanitizeFilename(name),
             progress: 0,
             error: true,
